@@ -1,31 +1,13 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request, status, Form, Header
 from pydantic import BaseModel, Field
+from request_body import Book
 from uuid import UUID
 from typing import Optional
 
 #initiating FastAPI object
 app = FastAPI()
 
-#This is called Request Body. It shows all the required parameters of Book Object
-class Book(BaseModel):
-    id: UUID
-    title: str = Field(title="Title of the Book ",min_length=1)
-    author: str = Field(title="Author of the Book",min_length=1)
-    description: Optional[str] = Field(title="Description of the Book",min_length=1,max_length=100)
-    rating: int
-    
-    #It shows the example values of the Book Object
-    class Config:
-        schema = {
-            "Example": {
-            "id":"6bedb5b4-ed8c-4aa8-877c-f6e0745e0849",
-            "title":"Name of the book",
-            "author":"Name of the Author of the book",
-            "description":"Give a Genuine Description",
-            "rating":"0-5"
-        }   
-        }
-    
+  
 BOOKS=[]
 
 #decorator with [get or put or post or delete method] with root
@@ -35,7 +17,14 @@ async def get_all_books():
         adding_default_books()
     return BOOKS
 
-@app.post('/')
+#We are using Form for getting user login
+@app.post('/books/login')
+async def book_login(username: str = Form(...), password: str = Form(...)):
+    return {"usermame": username, "password": password}
+
+
+#You will get 201 status code when something new is created
+@app.post('/', status_code=status.HTTP_201_CREATED)
 async def create_book(book: Book):
     BOOKS.append(book)
     
