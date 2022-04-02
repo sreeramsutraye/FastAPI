@@ -3,8 +3,10 @@ from pydantic import BaseModel, Field
 from uuid import UUID
 from typing import Optional
 
+#initiating FastAPI object
 app = FastAPI()
 
+#This is called Request Body. It shows all the required parameters of Book Object
 class Book(BaseModel):
     id: UUID
     title: str = Field(title="Title of the Book ",min_length=1)
@@ -12,7 +14,8 @@ class Book(BaseModel):
     description: Optional[str] = Field(title="Description of the Book",min_length=1,max_length=100)
     rating: int
     
-    class Confih:
+    #It shows the example values of the Book Object
+    class Config:
         schema = {
             "Example": {
             "id":"6bedb5b4-ed8c-4aa8-877c-f6e0745e0849",
@@ -25,6 +28,7 @@ class Book(BaseModel):
     
 BOOKS=[]
 
+#decorator with [get or put or post or delete method] with root
 @app.get('/')
 async def get_all_books():
     if len(BOOKS)<1:
@@ -106,6 +110,7 @@ def adding_default_books():
     BOOKS.append(book_4)
     BOOKS.append(book_5)
 
+#This function is used to raise an exception when the book is not found in the database
 def raise_when_items_not_found():
     return HTTPException(status_code=404, 
                         detail="Book Not Found",
